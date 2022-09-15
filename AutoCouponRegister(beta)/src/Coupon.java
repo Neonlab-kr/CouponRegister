@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Scanner;
+import java.util.Vector;
 import java.awt.Desktop;
 import java.awt.Color;
 import javax.swing.JList;
@@ -36,8 +37,10 @@ public class Coupon extends JFrame {
 	private JPanel contentPane;
 	private JTextField couponInput;
 	private JTextField memberInput;
+	private JScrollPane memberScroll;
 	private BufferedWriter writer = null;
 	private BufferedReader reader = null;
+	Vector<String> GuildMember = new Vector<String>();
 
 	/**
 	 * Launch the application.
@@ -66,6 +69,8 @@ public class Coupon extends JFrame {
 			public void windowClosing(WindowEvent e) {
 				// System.exit(0);
 				try {
+					for(String nickname:GuildMember)
+						writer.write(nickname+"\n");
 					writer.flush();
 					writer.close();
 				} catch (IOException io) {
@@ -75,8 +80,6 @@ public class Coupon extends JFrame {
 
 			});
 		
-		String GuildMember[] = { "울프_", "다연1", "Neonlab", "세인트폴리아", "재현3", "남검", "재현2", "히하호", "유소현", "사불상", "실바니아",
-				"후루꾸루", "BlackList", "엘지마트", "닥터핸즈", "이쁘이", "겨울나뭇", "롤로노아조로", "번집", "소희왕자" };
 		setTitle("마상지 쿠폰 등록기");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 438, 420);
@@ -102,9 +105,9 @@ public class Coupon extends JFrame {
 		registerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					for (int i = 0; i < GuildMember.length; i++) {
+					for (String nickname:GuildMember) {
 						Desktop.getDesktop().browse(new URI("https://gift.supermembers.net/coupon/?code="
-								+ couponInput.getText() + "&scode=zio_kr&name=" + GuildMember[i] + "&ok=1"));
+								+ couponInput.getText() + "&scode=zio_kr&name=" + nickname + "&ok=1"));
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -143,15 +146,16 @@ public class Coupon extends JFrame {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true),"utf-8"));
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
 
 		String str;
 		while ((str = reader.readLine()) != null) {
 			model.addElement(str);
+			GuildMember.add(str);
 		}
 		reader.close();
 
+		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"utf-8"));
 		JButton addButton = new JButton("추가");
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -159,13 +163,9 @@ public class Coupon extends JFrame {
 				if (inputText == null || inputText.length() == 0)
 					return;
 				model.addElement(inputText);
+				GuildMember.add(inputText);
 				memberInput.setText("");
-				try {
-					writer.write("\n" + inputText);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				//memberScroll.getVerticalScrollBar().setValue(memberScroll.getVerticalScrollBar().getMaximum());//자동 스크롤 동작 안함
 			}
 		});
 		addButton.setBounds(226, 4, 76, 23);
@@ -175,14 +175,15 @@ public class Coupon extends JFrame {
 		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (memberList.getSelectedIndex() >= 0)
+					GuildMember.remove(memberList.getSelectedIndex());
 					model.remove(memberList.getSelectedIndex());
 			}
 		});
 		deleteButton.setBounds(310, 4, 76, 23);
 		memberPanel.add(deleteButton);
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(215, 64, 57, 23);
-		memberPanel.add(scrollPane);
+		memberScroll = new JScrollPane();
+		memberScroll.setBounds(215, 64, 57, 23);
+		memberPanel.add(memberScroll);
 	}
 }
