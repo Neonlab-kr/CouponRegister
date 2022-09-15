@@ -143,8 +143,8 @@ public class Coupon extends JFrame {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true),"utf-8"));
+		reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
 
 		String str;
 		while ((str = reader.readLine()) != null) {
