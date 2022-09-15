@@ -80,7 +80,7 @@ public class Coupon extends JFrame {
 
 			});
 		
-		setTitle("마상지 쿠폰 등록기");
+		setTitle("마상지 쿠폰 등록기 (제작자 : Neonlab)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 438, 420);
 		contentPane = new JPanel();
