@@ -114,6 +114,7 @@ public class Coupon extends JFrame {
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();
 				}
+				couponInput.setText("");
 			}
 		});
 
