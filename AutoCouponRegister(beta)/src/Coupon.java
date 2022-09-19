@@ -143,7 +143,7 @@ public class Coupon extends JFrame {
 		memberListScroll.setBounds(12, 33, 374, 265);
 		memberPanel.add(memberListScroll);
 
-		File file = new File("./src/Member.txt");
+		File file = new File("./Member.txt");
 		if (!file.exists()) {
 			file.createNewFile();
 		}
