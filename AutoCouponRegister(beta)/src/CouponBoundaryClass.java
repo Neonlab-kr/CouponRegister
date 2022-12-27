@@ -32,15 +32,14 @@ import java.awt.Color;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
-public class Coupon extends JFrame {
+public class CouponBoundaryClass extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField couponInput;
-	private JTextField memberInput;
 	private JScrollPane memberScroll;
-	private BufferedWriter writer = null;
-	private BufferedReader reader = null;
-	Vector<String> GuildMember = new Vector<String>();
+	protected JTextField couponInput;
+	protected JTextField memberInput;
+	protected JList memberList;
+	
 
 	/**
 	 * Launch the application.
@@ -49,7 +48,7 @@ public class Coupon extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Coupon frame = new Coupon();
+					CouponBoundaryClass frame = new CouponBoundaryClass();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -63,24 +62,17 @@ public class Coupon extends JFrame {
 	 * 
 	 * @throws IOException
 	 */
-	public Coupon() throws IOException {
+	public CouponBoundaryClass() throws IOException {
+		CouponControlClass CCC = new CouponControlClass();
 		
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e) {
-				// System.exit(0);
-				try {
-					for(String nickname:GuildMember)
-						writer.write(nickname+"\n");
-					writer.flush();
-					writer.close();
-				} catch (IOException io) {
-					io.printStackTrace();
-				}
+				CCC.MemberFileSave();
 			}
 
 			});
 		
-		setTitle("마상지 쿠폰 등록기 (제작자 : Neonlab)");
+		setTitle("마상지 쿠폰 등록기v1 (제작자 : Neonlab)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 438, 420);
 		contentPane = new JPanel();
@@ -104,17 +96,7 @@ public class Coupon extends JFrame {
 		couponPanel.add(registerButton);
 		registerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					for (String nickname:GuildMember) {
-						Desktop.getDesktop().browse(new URI("https://gift.supermembers.net/coupon/?code="
-								+ couponInput.getText() + "&scode=zio_kr&name=" + nickname + "&ok=1"));
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
-				}
-				couponInput.setText("");
+				CCC.CouponRegister(couponInput);
 			}
 		});
 
@@ -136,37 +118,19 @@ public class Coupon extends JFrame {
 		nicknameText.setBounds(12, 8, 75, 15);
 		memberPanel.add(nicknameText);
 
-		JList memberList = new JList(new DefaultListModel());
+		memberList = new JList(new DefaultListModel());
 		DefaultListModel model = (DefaultListModel) memberList.getModel();
 		memberList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane memberListScroll = new JScrollPane(memberList);
 		memberListScroll.setBounds(12, 33, 374, 265);
 		memberPanel.add(memberListScroll);
 
-		File file = new File("./Member.txt");
-		if (!file.exists()) {
-			file.createNewFile();
-		}
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
-
-		String str;
-		while ((str = reader.readLine()) != null) {
-			model.addElement(str);
-			GuildMember.add(str);
-		}
-		reader.close();
-
-		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"utf-8"));
+		CCC.MemberFileRead(memberList);
+		
 		JButton addButton = new JButton("추가");
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String inputText = memberInput.getText().trim();
-				if (inputText == null || inputText.length() == 0)
-					return;
-				model.addElement(inputText);
-				GuildMember.add(inputText);
-				memberInput.setText("");
-				//memberScroll.getVerticalScrollBar().setValue(memberScroll.getVerticalScrollBar().getMaximum());//자동 스크롤 동작 안함
+				CCC.AddMember(memberInput, memberList);
 			}
 		});
 		addButton.setBounds(226, 4, 76, 23);
@@ -175,9 +139,7 @@ public class Coupon extends JFrame {
 		JButton deleteButton = new JButton("삭제");
 		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (memberList.getSelectedIndex() >= 0)
-					GuildMember.remove(memberList.getSelectedIndex());
-					model.remove(memberList.getSelectedIndex());
+				CCC.DeleteMember(memberList);
 			}
 		});
 		deleteButton.setBounds(310, 4, 76, 23);
